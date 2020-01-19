@@ -1,0 +1,25 @@
+@RequestMapping(value = "/login/disease", method = RequestMethod.GET)
+	  	
+	  		 public String view2(Model model) throws Exception {
+	    	  Disease disease = new Disease();
+	  				
+	  				model.addAttribute("diseasesTypes", disease);
+	  		        return "Diseases";
+	  		    }
+
+	  	
+	@RequestMapping(value = "/disease/add", method = RequestMethod.POST)	
+	  		public void saveProduct(@ModelAttribute("diseasesTypes")  ListOfDiseases listOfDiseases ,BindingResult result,HttpSession httpSession, Model model ,
+	  				final RedirectAttributes redirectAttributes	) {
+			
+			List<Disease> deseases=listOfDiseases.getDeseases();
+			Disease disease2 = new Disease();
+	  		 for(Disease disease : deseases) {
+	  			 
+	  			
+	  			disease2.setName_Of_Disease(disease.getName_Of_Disease());
+	  		    
+				itemService.save(disease);
+  		 }     				      
+			      
+	  	    
