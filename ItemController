@@ -1,0 +1,121 @@
+package com.pharmacy.controller;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+//import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.pharmacy.model.Disease;
+import com.pharmacy.model.Item;
+
+import com.pharmacy.model.ListOfDiseases;
+
+import com.pharmacy.service.ItemService;
+
+
+@Controller
+@Transactional
+public class ItemController {
+	
+	
+	@Autowired 
+	ItemService itemService ;
+	
+	 @RequestMapping(value = "/login/item", method = RequestMethod.GET)
+	//@GetMapping(value = "/login/add/item")
+		 public String view(Model model) throws Exception {
+			 Item item = new Item();
+				
+				model.addAttribute("itemM", item);
+		        return "itemManagement";
+		    }
+
+	 @RequestMapping(value = "/item/add", method = RequestMethod.POST)
+		public void saveItem(@ModelAttribute("itemM")  Item item ,BindingResult result,HttpSession httpSession, Model model ,
+				final RedirectAttributes redirectAttributes	) {
+		 
+	     model.addAttribute("itemName",item.getItemName());
+	     model.addAttribute("EXD", item.getEXD());
+	     model.addAttribute("MFD", item.getMFD()); 
+	     itemService.save(item);
+	 }    
+	      
+	 
+	 //Display the form to insert differnt types of Diseases 
+	 @RequestMapping(value = "/login/disease", method = RequestMethod.GET)
+	  	
+	 public String view2(Model model) throws Exception {
+	    	  Disease disease = new Disease();
+	  				
+	  	  model.addAttribute("diseasesTypes", disease);
+	 	  return "Diseases";
+	   }
+
+	//Save the types of diseases	
+	@RequestMapping(value = "/disease/add", method = RequestMethod.POST)	
+	 public void saveProduct(@ModelAttribute("diseasesTypes")  ListOfDiseases listOfDiseases ,BindingResult result,HttpSession httpSession, Model model ,
+	 final RedirectAttributes redirectAttributes	) {
+			
+			List<Disease> deseases=listOfDiseases.getDeseases();
+			
+	  		 for(Disease disease : deseases) {
+	  		  model.addAttribute("Name_Of_Disease", disease.getName_Of_Disease()); 
+	  		  itemService.save(disease);
+  		 }     				      
+			      
+	  }		
+
+        @RequestMapping(value = "/login/alert", method = RequestMethod.GET)
+        //@GetMapping(value = "/login/add/item")
+	public String view3(Model model) throws Exception {
+		
+		        model.addAttribute("itemM", itemService.findAll());
+		        return "showBEx";
+         }
+		 
+		 
+       @RequestMapping(value = "/login/due", method = RequestMethod.GET)
+       //@GetMapping(value = "/login/add/item")
+        public String view4(Model model, Date EXD) throws Exception {
+		
+		     model.addAttribute("itemM", itemService.findByEXDBefore(EXD));
+		      return "DueItems";
+       }
+		 
+		
+	 @RequestMapping(value = "/login/stock", method = RequestMethod.GET)
+		  	
+         public String view5(Model model, Long quantity ) throws Exception {
+		
+	 	model.addAttribute("itemM", itemService.findByQuantity(quantity));
+		        
+		return "stockMgt";
+	 }
+		 
+		 
+	 @RequestMapping("/login/catergorise")
+		  	
+	 public ModelAndView view6() {
+	
+		 return new ModelAndView ("CatergoriseForm");
+	}
+		 
+	 
+		
+	}
+	
+
