@@ -56,28 +56,45 @@ public class ItemController {
 	      
 	 
 	 //Display the form to insert differnt types of Diseases 
-	 @RequestMapping(value = "/login/disease", method = RequestMethod.GET)
-	  	
-	 public String view2(Model model) throws Exception {
-	    	  Disease disease = new Disease();
-	  				
-	  	  model.addAttribute("diseasesTypes", disease);
-	 	  return "Diseases";
-	   }
+	
+	@RequestMapping(value = "/login/disease", method = RequestMethod.GET)
+	public String view2() throws Exception {
+		return "Diseases";
+	}
 
-	//Save the types of diseases	
-	@RequestMapping(value = "/disease/add", method = RequestMethod.POST)	
-	 public void saveProduct(@ModelAttribute("diseasesTypes")  ListOfDiseases listOfDiseases ,BindingResult result,HttpSession httpSession, Model model ,
-	 final RedirectAttributes redirectAttributes	) {
-			
-			List<Disease> deseases=listOfDiseases.getDeseases();
-			
-	  		 for(Disease disease : deseases) {
-	  		  model.addAttribute("Name_Of_Disease", disease.getName_Of_Disease()); 
-	  		  itemService.save(disease);
-  		 }     				      
-			      
-	  }		
+	// @RequestMapping(value = "/disease/add", method =
+	// RequestMethod.POST,consumes="application/json")
+	// @RequestMapping(value = "/disease/add", method = RequestMethod.POST)
+	// public void saveProduct(@ModelAttribute ("diseasesTypes") ListOfDiseases
+	// listOfDiseases ,BindingResult result,HttpSession httpSession, Model model
+	// ,
+	// final RedirectAttributes redirectAttributes ) {
+
+	// itemService.save(listOfDiseases.getDeseases());
+	// List<Disease> deseases=listOfDiseases.getDeseases();
+
+	// for(Disease disease : deseases) {
+
+	// model.addAttribute("Name_Of_Disease", disease.getName_Of_Disease());
+	// itemService.save(disease);
+	// }
+
+	// }
+
+	@RequestMapping(value = "/disease/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody ResponseValidator saveProduct(@RequestBody List<String> diseases) {
+		ResponseValidator responseValidator = new ResponseValidator();
+		for (String diseaseName : diseases) {
+			Disease disease = new Disease();
+			disease.setName_Of_Disease(diseaseName);
+			itemService.save(disease);
+		}
+		responseValidator.setStatus(true);
+		responseValidator.setResponseCode("200");
+		responseValidator.setResponseMessage("Transaction Complete!");
+		return responseValidator;
+	}
+
 
         @RequestMapping(value = "/login/alert", method = RequestMethod.GET)
         //@GetMapping(value = "/login/add/item")
